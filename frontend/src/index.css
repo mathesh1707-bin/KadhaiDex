@@ -1,0 +1,22 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Press Start 2P", monospace;
+  background: #fff0be;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #ffd6a6;
+}
+::-webkit-scrollbar-thumb {
+  background: #e07060;
+  border: 2px solid #3a1a10;
+}
