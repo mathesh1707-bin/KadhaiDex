@@ -3,6 +3,7 @@ package com.example.kadhaiDex.backend.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.kadhaiDex.backend.dto.UserRequest;
@@ -11,11 +12,12 @@ import com.example.kadhaiDex.backend.repository.UserRepository;
 
 @Service
 public class UserService {
-    
+    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository,PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public User registerUser(UserRequest request) {
@@ -32,7 +34,7 @@ public class UserService {
 
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         user.setCreatedAt(LocalDateTime.now());
 
