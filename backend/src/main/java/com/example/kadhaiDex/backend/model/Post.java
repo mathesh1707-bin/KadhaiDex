@@ -3,6 +3,9 @@ package com.example.kadhaiDex.backend.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -20,9 +23,11 @@ public class Post {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties({"posts", "comments", "password"})
     private User user;
 
     @OneToMany(mappedBy = "post")
+    @JsonIgnore
     private List<Comment> comments;
 
     public Post() {

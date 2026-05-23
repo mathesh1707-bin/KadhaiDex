@@ -1,7 +1,6 @@
 package com.example.kadhaiDex.backend.model;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -17,13 +16,16 @@ public class User {
 
     @Column(unique = true)
     private String email;
+    @JsonIgnore 
     private String password;
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private List<Post> posts;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private List<Comment> comments;
 
     public User() {

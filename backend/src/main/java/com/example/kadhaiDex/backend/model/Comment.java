@@ -2,6 +2,9 @@ package com.example.kadhaiDex.backend.model;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,10 +24,12 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties({"posts", "comments", "password"})
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "post_id")
+    @JsonIgnoreProperties({"comments"})
     private Post post;
 
     public Comment() {
@@ -35,8 +40,10 @@ public class Comment {
         this.createdAt = createdAt;
     }
 
-
-     public String getText() {
+    public Long getCommentId() {
+        return commentId;
+    }
+    public String getText() {
         return text;
     }
 

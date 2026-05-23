@@ -10,5 +10,6 @@ import com.example.kadhaiDex.backend.model.User;
 public interface PostRepository extends JpaRepository<Post,Long> {
 
     List<Post> findByUser(User user);
-    List<Post> findByTitleContaining(String keyword);
+
+    List<Post> findByTitleContainingIgnoreCase(String keyword);
 } 
