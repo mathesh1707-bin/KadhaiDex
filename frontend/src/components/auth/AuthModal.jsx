@@ -12,7 +12,6 @@ const AuthModal = ({ onClose, onLogin }) => {
     onLogin(username);
     onClose();
   };
-
   return (
     <div
       style={{
