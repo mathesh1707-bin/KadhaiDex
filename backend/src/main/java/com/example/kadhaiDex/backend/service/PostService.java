@@ -43,15 +43,10 @@ public class PostService {
 
     public Post getPostById(Long postId) {
         return postRepo.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new RuntimeException("Post not found!"));
     }
     
     public void deletePost(Long postId){
         postRepo.deleteById(postId);
     }
-
-
-
-
-
 }
