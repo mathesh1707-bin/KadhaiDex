@@ -1,59 +1,59 @@
 package com.example.kadhaiDex.backend.security;
 
-import java.security.Key;
-import java.util.Date;
+import java.io.IOException;
+import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-public class JwtFilter {
-    @Component
-public class JwtUtil {
+@Component
+public class JwtFilter extends OncePerRequestFilter {
 
-    @Value("${jwt.secret}")
-    private String secret;
+    private JwtUtil jwtUtil;
 
-    @Value("${jwt.expiration}")
-    private long expiration;
-
-    public String generateToken(String email) {
-        return Jwts.builder()
-            .setSubject(email)
-            .setIssuedAt(new Date())
-            .setExpiration(new Date(System.currentTimeMillis() + expiration))
-            .signWith(getSignKey(), SignatureAlgorithm.HS256)
-            .compact();
+    public JwtFilter(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
     }
 
-    public String extractEmail(String token) {
-        return extractClaims(token).getSubject();
-    }
+    @Override
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain)
+            throws ServletException, IOException {
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        return extractEmail(token).equals(userDetails.getUsername()) && !isTokenExpired(token);
-    }
+        String authHeader = request.getHeader("Authorization");
 
-    private boolean isTokenExpired(String token) {
-        return extractClaims(token).getExpiration().before(new Date());
-    }
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-    private Claims extractClaims(String token) {
-        return Jwts.parserBuilder()
-            .setSigningKey(getSignKey())
-            .build()
-            .parseClaimsJws(token)
-            .getBody();
-    }
+        String token = authHeader.substring(7);
 
-    private Key getSignKey() {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+        if (jwtUtil.validateToken(token)) {
+            String email = jwtUtil.extractEmail(token);
+            String role = jwtUtil.extractRole(token);
+
+            List<SimpleGrantedAuthority> authorities = 
+                List.of(new SimpleGrantedAuthority("ROLE_" + role));
+
+            UsernamePasswordAuthenticationToken authToken =
+                    new UsernamePasswordAuthenticationToken(email, null, authorities);
+
+            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+        }
+
+        filterChain.doFilter(request, response);
     }
-}
 }
